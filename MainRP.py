@@ -1,65 +1,33 @@
-from Class_Portefeuille import *
-from Class_Roulette import *
-from Class_PariR import *
+# IMPORTS
 
 import pygame
+from pygame.locals import *
 import sys
 
-# Initialisation de Pygame
+# INIT. PYGAME
+
 pygame.init()
+infoObject = pygame.display.Info()
+size = (infoObject.current_w, infoObject.current_h)
+WIDTH, HEIGHT = infoObject.current_w, infoObject.current_h
+screen = pygame.display.set_mode(size)
+font = pygame.font.SysFont(None, 64)
+GAMEBG = pygame.image.load('grille.png')
 
-# Définition des couleurs
-ROUGE = (255, 0, 0)
-NOIR = (0, 0, 0)
-VERT = (0, 255, 0)
+bg_width = GAMEBG.get_width()
+bg_height = GAMEBG.get_height()
+scale_factor = WIDTH / bg_width
+scaled_width = int(bg_width * scale_factor)
+scaled_height = int(bg_height * scale_factor)
+scaled_bg = pygame.transform.scale(GAMEBG, (scaled_width, scaled_height))
 
-# Définition de la taille de l'écran
-TAILLE_ECRAN = (800, 600)
-ecran = pygame.display.set_mode(TAILLE_ECRAN)
-
-# Création d'une horloge pour contrôler le taux de rafraîchissement
-horloge = pygame.time.Clock()
-
-# Création des instances de vos classes
-roulette = Roulette()
-portefeuille = Portefeuille(1000)  # Commence avec 1000 euros
-pari = Pari(roulette, portefeuille)
-
-# Création des boutons de pari
-types_pari = ['parier_couleur', 'parier_nombre', 'parier_plage', 'parier_douzaine', 'parier_colonne', 'parier_pair_impair', 'parier_manque_passe']
-boutons_pari = {type_pari: pygame.Rect(20, 80 + i * 60, 200, 50) for i, type_pari in enumerate(types_pari)}
-
-# Boucle principale du jeu
+game_background = pygame.transform.scale(GAMEBG, (WIDTH, HEIGHT))
 while True:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             pygame.quit()
-            sys.exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            for type_pari, rect in boutons_pari.items():
-                if rect.collidepoint(event.pos):
-                    # L'utilisateur a cliqué sur un bouton de pari
-                    mise = 10  # À remplacer par la mise choisie par l'utilisateur
-                    valeur = 'Rouge'  # À remplacer par la valeur choisie par l'utilisateur
-                    gagne, gain = pari.parier(type_pari, mise, valeur)
-                    print(f"Gagné: {gagne}, Gain: {gain}, Solde: {portefeuille.solde}")
+        elif event.type == MOUSEBUTTONDOWN:
+            screen.blit(scaled_bg, (0, 0))
 
-    # Remplissage de l'écran
-    ecran.fill((255, 255, 255))
-
-    # Affichage du solde actuel
-    police = pygame.font.Font(None, 36)
-    texte = police.render(f"Solde actuel: {portefeuille.solde}", 1, (10, 10, 10))
-    ecran.blit(texte, (20, 50))
-
-    # Affichage des boutons de pari
-    for type_pari, rect in boutons_pari.items():
-        pygame.draw.rect(ecran, NOIR, rect, 2)
-        texte = police.render(type_pari, 1, NOIR)
-        ecran.blit(texte, rect.move(10, 10))
-
-    # Mise à jour de l'affichage
     pygame.display.flip()
 
-    # Contrôle du taux de rafraîchissement
-    horloge.tick(60)
