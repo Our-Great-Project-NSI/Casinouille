@@ -1,4 +1,5 @@
 import random
+import pygame
 
 
 class Roulette:
@@ -15,4 +16,30 @@ class Roulette:
             color = 'Noir'
         else:
             color = 'Vert'
+        print('---')
+        print(number, color)
+        print('---')
         return number, color
+
+
+class Button:
+    def __init__(self, x, y, width, height, text=None, color=(0, 255, 0), font_size=36):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = text
+        self.color = color
+        self.font = pygame.font.Font(None, font_size)
+
+    def draw(self, screen, alpha=256):
+        button_surface = pygame.Surface((self.rect.width, self.rect.height))
+        button_surface.fill(self.color)
+        button_surface.set_alpha(alpha)
+        screen.blit(button_surface, (self.rect.x, self.rect.y))
+
+        text_surface = self.font.render(self.text, True, (0, 0, 0))
+        text_x = self.rect.x + (self.rect.width - text_surface.get_width()) / 2
+        text_y = self.rect.y + (self.rect.height - text_surface.get_height()) / 2
+        screen.blit(text_surface, (text_x, text_y))
+
+    def is_clicked(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            return self.rect.collidepoint(event.pos)
